@@ -38,7 +38,7 @@ const dpidsCumulativeTable = {
 const dpidsInstantaneous = Object.values(dpidsInstantaneousTable);
 const dpidsCumulative = Object.values(dpidsCumulativeTable);
 
-const mqttClient = () => {
+const mqttClient = (messageEventEmitter) => {
   let r = Math.floor(Math.random() * 10000);
   let clientId = "mqtt-" + r;
 
@@ -61,6 +61,7 @@ const mqttClient = () => {
       try {
         const received = JSON.parse(message.toString());
         const pj1203awData = received.ZbReceived[PJ1203AW];
+        messageEventEmitter.emit("pj1203awMessage", pj1203awData);
 
         const dpid = Object.keys(pj1203awData).find((value) =>
           /EF00\/\d{2}[\d\w]{2}/.test(value)
