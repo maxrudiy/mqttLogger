@@ -1,8 +1,8 @@
 import NodeCache from "node-cache";
 import mqtt from "mqtt";
 import {
-  Pj1203awInstantaneousModel,
-  Pj1203awCumulativeModel,
+  Pj1203awInstModel,
+  Pj1203awTotalModel,
 } from "../models/pj1203aw-models.js";
 
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
@@ -11,10 +11,10 @@ const MQTT_PASSWORD = process.env.MQTT_PASSWORD;
 const MQTT_TOPIC = process.env.MQTT_TOPIC;
 const PJ1203AW = process.env.PJ1203AW;
 
-const msgQueueInstantaneous = new NodeCache();
-const msgQueueCumulative = new NodeCache();
+const queueInst = new NodeCache();
+const queueTotal = new NodeCache();
 
-const dpidsInstantaneousTable = {
+const idsInstTable = {
   powerTotal: "EF00/0273",
   powerA: "EF00/0265",
   powerB: "EF00/0269",
@@ -28,15 +28,24 @@ const dpidsInstantaneousTable = {
   currentB: "EF00/0272",
 };
 
-const dpidsCumulativeTable = {
+const idsTotalTable = {
   forwardEnergyTotalA: "EF00/026A",
   reverseEnergyTotalA: "EF00/026B",
   forwardEnergyTotalB: "EF00/026C",
   reverseEnergyTotalB: "EF00/026D",
 };
 
-const dpidsInstantaneous = Object.values(dpidsInstantaneousTable);
-const dpidsCumulative = Object.values(dpidsCumulativeTable);
+const formattedMessageFunc = (id, value, table) => {
+  const formattedMessage = {};
+  const propertyName = Object.entries(table).find((item) =>
+    item.includes(id)
+  )[0];
+  formattedMessage[propertyName] = value;
+  return formattedMessage;
+};
+
+const idsInst = Object.values(idsInstTable);
+const idsTotal = Object.values(idsTotalTable);
 
 const mqttClient = (messageEventEmitter) => {
   let r = Math.floor(Math.random() * 10000);
@@ -61,34 +70,41 @@ const mqttClient = (messageEventEmitter) => {
       try {
         const received = JSON.parse(message.toString());
         const pj1203awData = received.ZbReceived[PJ1203AW];
-        messageEventEmitter.emit("pj1203awMessage", pj1203awData);
 
-        const dpid = Object.keys(pj1203awData).find((value) =>
+        const id = Object.keys(pj1203awData).find((value) =>
           /EF00\/\d{2}[\d\w]{2}/.test(value)
         );
+        if (idsInst.includes(id)) {
+          const formattedMessage = formattedMessageFunc(
+            id,
+            pj1203awData[id],
+            idsInstTable
+          );
+          messageEventEmitter.emit("pj1203awMessage", formattedMessage);
 
-        if (dpidsInstantaneous.includes(dpid)) {
-          if (msgQueueInstantaneous.has("EF00/0466")) {
-            let dbData = {};
-            for (let key of Object.keys(dpidsInstantaneousTable)) {
-              dbData[key] = msgQueueInstantaneous.get(
-                dpidsInstantaneousTable[key]
-              );
-            }
-            Pj1203awInstantaneousModel.create(dbData);
-            msgQueueInstantaneous.flushAll();
+          if (queueInst.has("powerDirectionA")) {
+            Pj1203awInstModel.create(queueInst.mget(queueInst.keys()));
+            queueInst.flushAll();
           }
-          msgQueueInstantaneous.set(dpid, pj1203awData[dpid]);
-        } else if (dpidsCumulative.includes(dpid)) {
-          if (msgQueueCumulative.has("EF00/026A")) {
-            let dbData = {};
-            for (let key of Object.keys(dpidsCumulativeTable)) {
-              dbData[key] = msgQueueCumulative.get(dpidsCumulativeTable[key]);
-            }
-            Pj1203awCumulativeModel.create(dbData);
-            msgQueueCumulative.flushAll();
+          queueInst.set(
+            Object.getOwnPropertyNames(formattedMessage)[0],
+            pj1203awData[id]
+          );
+        } else if (idsTotal.includes(id)) {
+          const formattedMessage = formattedMessageFunc(
+            id,
+            pj1203awData[id],
+            idsTotalTable
+          );
+          messageEventEmitter.emit("pj1203awMessage", formattedMessage);
+          if (queueTotal.has("forwardEnergyTotalA")) {
+            Pj1203awTotalModel.create(queueTotal.mget(queueTotal.keys()));
+            queueTotal.flushAll();
           }
-          msgQueueCumulative.set(dpid, pj1203awData[dpid]);
+          queueTotal.set(
+            Object.getOwnPropertyNames(formattedMessage)[0],
+            pj1203awData[id]
+          );
         } else {
           console.log(pj1203awData);
         }

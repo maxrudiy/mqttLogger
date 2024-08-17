@@ -1,16 +1,16 @@
 import {
-  Pj1203awInstantaneousModel,
-  Pj1203awCumulativeModel,
+  Pj1203awInstModel,
+  Pj1203awTotalModel,
 } from "../models/pj1203aw-models.js";
 
 class DashboardController {
   async getPj1203awData(req, res, next) {
     try {
-      const dataInstantaneous = await Pj1203awInstantaneousModel.find()
+      const dataInst = await Pj1203awInstModel.find()
         .sort({ time: "desc" })
         .limit(20);
-      const dataCumulative = await Pj1203awCumulativeModel.find();
-      res.json({ dataInstantaneous, dataCumulative });
+      const dataTotal = await Pj1203awTotalModel.find();
+      res.json({ dataInst, dataTotal });
     } catch (err) {
       console.log(err);
     }

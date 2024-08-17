@@ -14,7 +14,7 @@ const Pj1203aw = () => {
   return data ? (
     <div>
       Збережено у базу даних:
-      {data["dataInstantaneous"].map((value, index) => (
+      {data["dataInst"].map((value, index) => (
         <div key={index}>
           L1:{value.currentA / 1000}A, &emsp; P1=
           {Math.round(((Math.sqrt(3) * value.currentA) / 1000) * 380 * 10) /

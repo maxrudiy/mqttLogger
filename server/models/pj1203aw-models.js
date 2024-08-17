@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const Pj1203awInstantaneousSchema = new Schema({
+const Pj1203awInstSchema = new Schema({
   powerTotal: Number,
   powerA: Number,
   powerB: Number,
@@ -15,7 +15,7 @@ const Pj1203awInstantaneousSchema = new Schema({
   time: { type: Schema.Types.Date, default: () => Date.now() },
 });
 
-const Pj1203awCumulativeSchema = new Schema({
+const Pj1203awTotalSchema = new Schema({
   forwardEnergyTotalA: Number,
   reverseEnergyTotalA: Number,
   forwardEnergyTotalB: Number,
@@ -23,13 +23,7 @@ const Pj1203awCumulativeSchema = new Schema({
   time: { type: Schema.Types.Date, default: () => Date.now() },
 });
 
-const Pj1203awInstantaneousModel = model(
-  "Pj1203awInstantaneous",
-  Pj1203awInstantaneousSchema
-);
-const Pj1203awCumulativeModel = model(
-  "Pj1203awCumulative",
-  Pj1203awCumulativeSchema
-);
+const Pj1203awInstModel = model("Pj1203awInst", Pj1203awInstSchema);
+const Pj1203awTotalModel = model("Pj1203awTotal", Pj1203awTotalSchema);
 
-export { Pj1203awInstantaneousModel, Pj1203awCumulativeModel };
+export { Pj1203awInstModel, Pj1203awTotalModel };
