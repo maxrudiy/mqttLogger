@@ -1,9 +1,9 @@
 import { WebSocketServer } from "ws";
 
-const WS_PORT = process.env.WS_PORT || 8081;
+const WSS_PORT = process.env.WSS_PORT || 8081;
 
 const wsServer = (messageEventEmitter) => {
-  const wss = new WebSocketServer({ port: WS_PORT });
+  const wss = new WebSocketServer({ port: WSS_PORT });
 
   wss.on("connection", (ws) => {
     ws.on("error", (err) => console.log(err));

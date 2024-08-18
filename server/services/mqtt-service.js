@@ -1,9 +1,6 @@
 import NodeCache from "node-cache";
 import mqtt from "mqtt";
-import {
-  Pj1203awInstModel,
-  Pj1203awTotalModel,
-} from "../models/pj1203aw-models.js";
+import { Pj1203awInstModel, Pj1203awTotalModel } from "../models/pj1203aw-models.js";
 
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
 const MQTT_USERNAME = process.env.MQTT_USERNAME;
@@ -37,9 +34,7 @@ const idsTotalTable = {
 
 const formattedMessageFunc = (id, value, table) => {
   const formattedMessage = {};
-  const propertyName = Object.entries(table).find((item) =>
-    item.includes(id)
-  )[0];
+  const propertyName = Object.entries(table).find((item) => item.includes(id))[0];
   formattedMessage[propertyName] = value;
   return formattedMessage;
 };
@@ -71,45 +66,29 @@ const mqttClient = (messageEventEmitter) => {
         const received = JSON.parse(message.toString());
         const pj1203awData = received.ZbReceived[PJ1203AW];
 
-        const id = Object.keys(pj1203awData).find((value) =>
-          /EF00\/\d{2}[\d\w]{2}/.test(value)
-        );
+        const id = Object.keys(pj1203awData).find((value) => /EF00\/\d{2}[\d\w]{2}/.test(value));
         if (idsInst.includes(id)) {
-          const formattedMessage = formattedMessageFunc(
-            id,
-            pj1203awData[id],
-            idsInstTable
-          );
+          const formattedMessage = formattedMessageFunc(id, pj1203awData[id], idsInstTable);
           messageEventEmitter.emit("pj1203awMessage", formattedMessage);
 
           if (queueInst.has("powerDirectionA")) {
             Pj1203awInstModel.create(queueInst.mget(queueInst.keys()));
             queueInst.flushAll();
           }
-          queueInst.set(
-            Object.getOwnPropertyNames(formattedMessage)[0],
-            pj1203awData[id]
-          );
+          queueInst.set(Object.getOwnPropertyNames(formattedMessage)[0], pj1203awData[id]);
         } else if (idsTotal.includes(id)) {
-          const formattedMessage = formattedMessageFunc(
-            id,
-            pj1203awData[id],
-            idsTotalTable
-          );
+          const formattedMessage = formattedMessageFunc(id, pj1203awData[id], idsTotalTable);
           messageEventEmitter.emit("pj1203awMessage", formattedMessage);
           if (queueTotal.has("forwardEnergyTotalA")) {
             Pj1203awTotalModel.create(queueTotal.mget(queueTotal.keys()));
             queueTotal.flushAll();
           }
-          queueTotal.set(
-            Object.getOwnPropertyNames(formattedMessage)[0],
-            pj1203awData[id]
-          );
+          queueTotal.set(Object.getOwnPropertyNames(formattedMessage)[0], pj1203awData[id]);
         } else {
           console.log(pj1203awData);
         }
       } catch (err) {
-        console.log(err);
+        console.log(err.message);
       }
     });
   });

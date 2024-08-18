@@ -5,7 +5,7 @@ import cors from "cors";
 import { mqttClient } from "./services/mqtt-service.js";
 import router from "./routes/dashboard-routes.js";
 import { EventEmitter } from "node:events";
-import { wsServer } from "./services/ws-service.js";
+import { wsServer } from "./services/wss-service.js";
 
 const PORT = process.env.PORT || 5001;
 const DB_URL = process.env.DB_URL;

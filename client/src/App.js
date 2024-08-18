@@ -1,12 +1,12 @@
 import { Route, Routes } from "react-router-dom";
-import Layout from "./component/Layout";
-import Pj1203aw from "./component/Pj1203aw";
+import { Layout } from "./components/Layout";
+import { Dashboard } from "./components/Dashboard";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Pj1203aw />} />
+        <Route index element={<Dashboard />} />
       </Route>
     </Routes>
   );
