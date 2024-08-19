@@ -1,12 +1,12 @@
 import React from "react";
-import { Polling } from "./Polling";
 import { Messages } from "./Messages";
+import { Chart } from "./Chart";
 
 const Dashboard = () => {
   return (
     <>
       <Messages />
-      <Polling />
+      <Chart />
     </>
   );
 };

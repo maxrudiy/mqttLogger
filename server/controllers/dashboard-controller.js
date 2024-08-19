@@ -21,7 +21,13 @@ const initialData = {
 class DashboardController {
   async getPj1203awData(req, res, next) {
     try {
-      const dataInst = await Pj1203awInstModel.find().sort({ time: "desc" }).limit(20);
+      const { history } = req.params;
+
+      const dataInst = await Pj1203awInstModel.find()
+        .select(["currentA", "currentB", "time", "-_id"])
+        .sort({ time: "desc" })
+        .limit(Number(history) >= 3600 ? 3600 : history);
+
       const dataTotal = await Pj1203awTotalModel.find();
       res.json({ dataInst, dataTotal });
     } catch (err) {

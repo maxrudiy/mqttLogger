@@ -5,7 +5,7 @@ const REACT_APP_WSS_URL = process.env.REACT_APP_WSS_URL;
 const messagesApiSlice = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getMessages: build.query({
-      query: () => `pj1203aw/messages`,
+      query: () => "pj1203aw/messages",
       async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
         const ws = new WebSocket(REACT_APP_WSS_URL);
         try {
