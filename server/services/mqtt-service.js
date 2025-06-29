@@ -43,7 +43,7 @@ const mqttClient = (messageEventEmitter) => {
             const REQUIRED_FIELDS = getFieldsByDataPoints(formattedMessage.model, devicesLibrary);
             const allFieldsPresent = REQUIRED_FIELDS.every((field) => queue.has(field));
             if (allFieldsPresent) {
-              const data = { model: formattedMessage.model, ...queue.mget(queue.keys()) };
+              const data = { model: formattedMessage.model, ...queue.mget(queue.keys()), time: new Date().toISOString() };
               SPM02V2Model.create(data);
               messageEventEmitter.emit("message", data); //Message cache using WebSocket service for update
               queue.flushAll();
