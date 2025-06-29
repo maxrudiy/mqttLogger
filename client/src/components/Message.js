@@ -1,44 +1,44 @@
 import React from "react";
-import { useGetMessageQuery } from "../api/message-api-slice";
+import { useSelector } from "react-redux";
 
 const Message = () => {
-  const { data, isFetching, isLoading } = useGetMessageQuery();
+  const latestMessage = useSelector((state) => state.latestMessage.message);
 
-  return data ? (
+  return latestMessage ? (
     <div>
-      Модель Лічильника: {data.model}
+      Модель Лічильника: {latestMessage.model}
       <br />
-      Спожито електроенергії: {data.energy} кВт*год
+      Спожито електроенергії: {latestMessage.energy} кВт*год
       <br />
-      Згенеровано електроенергії: {data.producedEnergy} кВт*год
+      Згенеровано електроенергії: {latestMessage.producedEnergy} кВт*год
       <br />
-      Коефіцієнт потужності: {data.powerFactor}
+      Коефіцієнт потужності: {latestMessage.powerFactor}
       <br />
-      Частота: {data.acFrequency} Гц
+      Частота: {latestMessage.acFrequency} Гц
       <br />
-      Напруга X:{data.voltageX} В
+      Напруга X:{latestMessage.voltageX} В
       <br />
-      Струм X: {data.currentX} А
+      Струм X: {latestMessage.currentX} А
       <br />
-      Потужність X: {data.powerX} Вт
+      Потужність X: {latestMessage.powerX} Вт
       <br />
-      Напруга Y: {data.voltageY} В
+      Напруга Y: {latestMessage.voltageY} В
       <br />
-      Струм Y: {data.currentY} А
+      Струм Y: {latestMessage.currentY} А
       <br />
-      Потужність Y: {data.powerY} Вт
+      Потужність Y: {latestMessage.powerY} Вт
       <br />
-      Напруга Z: {data.voltageZ} В
+      Напруга Z: {latestMessage.voltageZ} В
       <br />
-      Струм Z: {data.currentZ} А
+      Струм Z: {latestMessage.currentZ} А
       <br />
-      Потужність Z: {data.powerZ} Вт
+      Потужність Z: {latestMessage.powerZ} Вт
       <br />
-      Загальна потужність: {data.power} Вт
+      Загальна потужність: {latestMessage.power} Вт
       <br />
     </div>
   ) : (
-    isLoading
+    "isLoading"
   );
 };
 

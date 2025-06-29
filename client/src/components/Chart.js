@@ -1,15 +1,23 @@
-import React, { useState } from "react";
-import { useGetPollingQuery } from "../api/polling-api-slice";
+import React, { useEffect, useState } from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { formatTimeFunc } from "../functions";
 
-const Chart = () => {
-  const [history, setHistory] = useState(500);
-  const { data, isFetching, isLoading } = useGetPollingQuery(history, { pollingInterval: 3000 });
+import { useGetLatestMessagesQuery } from "../api/latest-messages-api-slice";
+import { useDispatch } from "react-redux";
+import { updateLatestMessage } from "../store/latest-message-slice";
 
-  let pollingDataFormatted = {};
+const Chart = () => {
+  const [minutes, setMinutes] = useState(30);
+  const { data, isLoading } = useGetLatestMessagesQuery(minutes);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!isLoading) dispatch(updateLatestMessage(data));
+  }, [data, dispatch, isLoading]);
+
+  let pollingDateFormatted = {};
   if (!isLoading) {
-    pollingDataFormatted = data.map((item) => ({
+    pollingDateFormatted = data.map((item) => ({
       ...item,
       time: formatTimeFunc(item.time),
     }));
@@ -17,7 +25,7 @@ const Chart = () => {
 
   const renderLineChart = (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={pollingDataFormatted} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+      <LineChart data={pollingDateFormatted} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
         <Tooltip />
         <Legend />
         <Line yAxisId="left" connectNulls type="monotone" dataKey="energy" stroke="#DC8B4B" dot={false} isAnimationActive={false} />
@@ -45,7 +53,7 @@ const Chart = () => {
 
   return (
     <>
-      <input type="text" onChange={(event) => setHistory(event.target.value)} defaultValue={history} />
+      <input type="text" onChange={(event) => setMinutes(event.target.value)} defaultValue={minutes} />
       {renderLineChart}
     </>
   );

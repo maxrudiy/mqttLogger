@@ -2,10 +2,10 @@ import { apiSlice } from "./api-slice";
 
 const REACT_APP_WSS_URL = process.env.REACT_APP_WSS_URL;
 
-const messageApiSlice = apiSlice.injectEndpoints({
+const latestMessagesApiSlice = apiSlice.injectEndpoints({
   endpoints: (build) => ({
-    getMessage: build.query({
-      query: () => "spm02v2/message",
+    getLatestMessages: build.query({
+      query: (minutes) => `spm02v2/latest/${minutes}`,
       async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
         const ws = new WebSocket(REACT_APP_WSS_URL);
         try {
@@ -13,9 +13,9 @@ const messageApiSlice = apiSlice.injectEndpoints({
 
           const listener = (event) => {
             const data = JSON.parse(event.data);
-            const propertyName = data.propertyName;
             updateCachedData((draft) => {
-              draft[propertyName] = data.value;
+              draft.unshift(data);
+              draft.pop();
             });
           };
 
@@ -28,4 +28,4 @@ const messageApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetMessageQuery } = messageApiSlice;
+export const { useGetLatestMessagesQuery } = latestMessagesApiSlice;

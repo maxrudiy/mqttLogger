@@ -18,4 +18,9 @@ const convertFunction = (received, devicesLibrary) => {
   return { model: libraryDeviceData.model, propertyName, value: applyFunction(received[receivedDeviceId][id]) };
 };
 
-export { convertFunction };
+const getFieldsByDataPoints = (model, devicesLibrary) => {
+  const dataPoints = Object.values(devicesLibrary.find((item) => (item.model = model)).dataPoints);
+  return dataPoints.map((item) => item[0]);
+};
+
+export { convertFunction, getFieldsByDataPoints };

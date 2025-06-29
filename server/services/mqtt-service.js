@@ -1,6 +1,6 @@
 import NodeCache from "node-cache";
 import mqtt from "mqtt";
-import { convertFunction } from "./functions.js";
+import { convertFunction, getFieldsByDataPoints } from "./functions.js";
 import { devicesLibrary } from "./devices-library.js";
 import { SPM02V2Model } from "../models/devices-models.js";
 
@@ -36,12 +36,19 @@ const mqttClient = (messageEventEmitter) => {
         const formattedMessage = convertFunction(received, devicesLibrary);
         switch (formattedMessage.model) {
           case "SPM02V2":
-            messageEventEmitter.emit("message", formattedMessage);
-            if (queue.has("power")) {
-              SPM02V2Model.create({ ...queue.mget(queue.keys()), model: formattedMessage.model });
+            // Save the field to cache
+            queue.set(formattedMessage.propertyName, formattedMessage.value);
+
+            // Check if all required fields are present in cache and save it to database
+            const REQUIRED_FIELDS = getFieldsByDataPoints(formattedMessage.model, devicesLibrary);
+            const allFieldsPresent = REQUIRED_FIELDS.every((field) => queue.has(field));
+            if (allFieldsPresent) {
+              const data = { model: formattedMessage.model, ...queue.mget(queue.keys()) };
+              SPM02V2Model.create(data);
+              messageEventEmitter.emit("message", data); //Message cache using WebSocket service for update
               queue.flushAll();
             }
-            queue.set(formattedMessage.propertyName, formattedMessage.value);
+
             break;
         }
       } catch (err) {
