@@ -6,6 +6,7 @@ import { mqttClient } from "./services/mqtt-service.js";
 import router from "./routes/dashboard-routes.js";
 import { EventEmitter } from "node:events";
 import { wsServer } from "./services/wss-service.js";
+import { errorLogger, errorResponce } from "./middlewares/errors-middleware.js";
 
 const PORT = process.env.PORT || 5001;
 const DB_URL = process.env.DB_URL;
@@ -29,6 +30,8 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(router);
+app.use(errorLogger);
+app.use(errorResponce);
 
 const start = async () => {
   try {
