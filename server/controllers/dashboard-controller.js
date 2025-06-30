@@ -10,9 +10,9 @@ class SPM02V2Controller {
         return next(ApiError.BadRequest("Wrong request", errors.array()));
       }
       const { minutes } = req.params;
-      const sinceTime = new Date(Date.now() - minutes * 60 * 1000);
+      const startTime = new Date(Date.now() - minutes * 60 * 1000);
 
-      const data = await SPM02V2Model.find({ time: { $gte: sinceTime } })
+      const data = await SPM02V2Model.find({ time: { $gte: startTime } })
         .select("-_id")
         .sort({ time: "desc" });
 
@@ -25,16 +25,16 @@ class SPM02V2Controller {
     }
   }
 
-  async getMessagesByDate(req, res, next) {
+  async getMessagesByTimeRange(req, res, next) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest("Wrong request", errors.array()));
       }
-      const sinceTime = req.query["since-time"];
-      const toTime = req.query["to-time"];
+      const startTime = req.query["start-time"];
+      const endTime = req.query["end-time"];
 
-      const data = await SPM02V2Model.find({ time: { $gte: sinceTime, $lte: toTime } })
+      const data = await SPM02V2Model.find({ time: { $gte: startTime, $lte: endTime } })
         .select("-_id")
         .sort({ time: "desc" });
 

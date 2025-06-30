@@ -1,3 +1,3 @@
-const formatTimeFunc = (time) => new Date(time).toLocaleTimeString("uk", { timeZone: "Europe/Kyiv" });
+const ISOTimeStringToLocaleTimeString = (time) => new Date(time).toLocaleTimeString(navigator.language);
 
-export { formatTimeFunc };
+export { ISOTimeStringToLocaleTimeString };

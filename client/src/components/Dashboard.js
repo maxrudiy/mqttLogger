@@ -1,12 +1,14 @@
 import React from "react";
-import { Message } from "./Message";
-import { Chart } from "./Chart";
+import { Message } from "./message";
+import { LatestChart } from "./latest-chart";
+import { ByTimeRangeChart } from "./by-time-range-chart";
 
 const Dashboard = () => {
   return (
     <>
       <Message />
-      <Chart />
+      <LatestChart />
+      <ByTimeRangeChart />
     </>
   );
 };
