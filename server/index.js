@@ -10,14 +10,14 @@ import { errorLogger, errorResponse } from "./middlewares/errors-middleware.js";
 
 const PORT = process.env.PORT || 5001;
 const DB_URL = process.env.DB_URL;
-const whitelist = ["http://localhost:3000", "http://172.24.7.201:3000", "http://185.209.57.135:1125"];
+const CORS_WHITE_LIST = process.env.CORS_WHITE_LIST ? process.env.CORS_WHITE_LIST.split(",") : [];
 
 const app = express();
 const messageEventEmitter = new EventEmitter();
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
+    if (!origin || CORS_WHITE_LIST.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
