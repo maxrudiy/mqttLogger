@@ -2,8 +2,10 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+
 import { mqttClient } from "./services/mqtt-service.js";
 import { SPM02V2Router } from "./routes/spm02v2-routes.js";
+import { streamRouter } from "./routes/stream-routes.js";
 import { EventEmitter } from "node:events";
 import { wsServer } from "./services/wss-service.js";
 import { errorLogger, errorResponse } from "./middlewares/errors-middleware.js";
@@ -30,6 +32,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(SPM02V2Router);
+app.use(streamRouter);
 app.use(errorLogger);
 app.use(errorResponse);
 
