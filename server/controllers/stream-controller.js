@@ -25,7 +25,7 @@ class StreamController {
       next(err);
     }
   }
-  getStreamURL(req, res, next) {
+  getHlsPlaylistUrl(req, res, next) {
     try {
       const streamName = req.query["stream-name"];
       console.log(streamName);
@@ -60,7 +60,7 @@ class StreamController {
       return next(err);
     }
   }
-  getStreamFiles() {
+  getFiles(req, res, next) {
     try {
       const { streamId, filename } = req.params;
       const streamInfo = activeStreams.get(streamId);

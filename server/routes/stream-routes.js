@@ -4,7 +4,7 @@ import StreamController from "../controllers/stream-controller.js";
 const streamRouter = new express.Router();
 
 streamRouter.get("/stream-names", StreamController.getStreamNames);
-streamRouter.get("/stream-url", StreamController.getStreamURL);
-streamRouter.get("/hls/:streamId/:filename", StreamController.getStreamFiles);
+streamRouter.get("/hls-play-list-url", StreamController.getHlsPlaylistUrl);
+streamRouter.get("/hls/:streamId/:filename", StreamController.getFiles);
 
 export { streamRouter };

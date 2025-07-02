@@ -2,7 +2,7 @@ import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ISOTimeStringToLocaleTimeString } from "../functions";
 
-function Chart(props) {
+const Chart = (props) => {
   const renderLineChart = (data) => {
     let dataDateFormatted = {};
     dataDateFormatted = data.map((item) => ({
@@ -39,6 +39,6 @@ function Chart(props) {
   };
 
   return <>{!props.isLoading ? renderLineChart(props.data) : "Loading"}</>;
-}
+};
 
 export default Chart;
