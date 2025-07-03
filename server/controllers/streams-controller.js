@@ -47,7 +47,11 @@ class StreamsController {
           console.error(`Error serving HLS file ${filePath}:`, err);
           return res.status(500).send("Server error.");
         }
-
+        if (req.url.endsWith(".ts")) {
+          res.setHeader("Cache-Control", "public, max-age=86400, immutable");
+        } else if (req.url.endsWith(".m3u8")) {
+          res.setHeader("Cache-Control", "no-cache");
+        }
         res.sendFile(filePath);
       });
     } catch (err) {
