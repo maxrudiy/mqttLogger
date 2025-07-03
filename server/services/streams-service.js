@@ -1,13 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { spawn } from "child_process";
 import { cleanupFunction } from "./functions.js";
+import { startFFmpegStream } from "./start-ffmpeg-stream.js";
 
 const IDLE_TIMEOUT_MS = 120000;
-const HLS_ENCODING_TIMEOUT_MS = 30000;
+const HLS_ENCODING_TIMEOUT_MS = 10000;
 const CLEANUP_INTERVAL_MS = 30000;
-const FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
 
 const activeStreams = new Map();
 
@@ -18,7 +17,7 @@ if (!fs.existsSync(HLS_DIR)) {
   fs.mkdirSync(HLS_DIR);
 }
 
-const streamsService = (rtspUrl) => {
+const getOrCreateStream = (rtspUrl) => {
   return new Promise(async (resolve, reject) => {
     try {
       let existingStreamId = null;
@@ -33,80 +32,11 @@ const streamsService = (rtspUrl) => {
       const outputDir = path.join(HLS_DIR, streamId);
       const outputPath = path.join(outputDir, "index.m3u8");
 
-      const ffmpegService = () => {
-        console.log(`Starting FFmpeg for stream ID: ${streamId} from ${rtspUrl}`);
-        const ffmpegArgs = [
-          "-rtsp_transport",
-          "tcp",
-          "-i",
-          rtspUrl,
-          "-c:v",
-          "libx264",
-          "-preset",
-          "veryfast",
-          "-tune",
-          "zerolatency",
-          "-crf",
-          "23",
-          "-vf",
-          "scale=1280:-1",
-          // "-c:a",
-          // "aac",
-          // "-ar",
-          // "44100",
-          // "-b:a",
-          // "128k",
-          "-f",
-          "hls",
-          "-hls_time",
-          "2",
-          "-hls_list_size",
-          "5",
-          "-hls_flags",
-          "delete_segments",
-          "-start_number",
-          "0",
-          outputPath,
-        ];
-
-        const ffmpegProcess = spawn(FFMPEG_PATH, ffmpegArgs);
-
-        activeStreams.set(streamId, {
-          process: ffmpegProcess,
-          lastAccess: Date.now(),
-          rtspUrl,
-          outputDir,
-        });
-
-        ffmpegProcess.stdout.on("data", (data) => {
-          // console.log(`FFmpeg stdout for ${streamId}: ${data}`);
-        });
-
-        ffmpegProcess.stderr.on("data", (data) => {
-          console.error(`FFmpeg stderr for ${streamId}: ${data}`);
-        });
-
-        ffmpegProcess.on("close", (code) => {
-          console.log(`FFmpeg process for stream ID ${streamId} exited with code ${code}`);
-          activeStreams.delete(streamId);
-          cleanupFunction(outputDir);
-        });
-
-        ffmpegProcess.on("error", (err) => {
-          console.error(`Failed to start FFmpeg process for stream ID ${streamId}: ${err.message}`);
-          activeStreams.delete(streamId);
-          cleanupFunction(outputDir);
-          reject(err);
-        });
-
-        console.log(`Spawned FFmpeg with command: ffmpeg ${ffmpegArgs.join(" ")}`);
-      };
-
       if (!existingStreamId) {
         if (!fs.existsSync(outputDir)) {
           fs.mkdirSync(outputDir);
         }
-        ffmpegService();
+        startFFmpegStream(rtspUrl, streamId, activeStreams, outputDir, outputPath);
         await waitForHLSFiles(outputPath, outputDir);
         resolve(`/hls/${streamId}/index.m3u8`);
       } else {
@@ -115,8 +45,6 @@ const streamsService = (rtspUrl) => {
         resolve(`/hls/${streamId}/index.m3u8`);
       }
     } catch (err) {
-      activeStreams.delete(streamId);
-      cleanupFunction(outputDir);
       reject(err);
     }
   });
@@ -159,4 +87,4 @@ process.on("SIGINT", () => {
   process.exit();
 });
 
-export { streamsService, activeStreams };
+export { getOrCreateStream, activeStreams };

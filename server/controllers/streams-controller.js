@@ -1,7 +1,7 @@
-import { streamsService } from "../services/streams-service.js";
-import { activeStreams } from "../services/streams-service.js";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import { activeStreams } from "../services/streams-service.js";
+import { getOrCreateStream } from "../services/streams-service.js";
 
 const RTSP_URL = process.env.RTSP_URL;
 
@@ -20,7 +20,7 @@ class StreamsController {
       //TODO
       const rtspUrl = RTSP_URL;
 
-      const hlsPlaylistUrl = await streamsService(rtspUrl);
+      const hlsPlaylistUrl = await getOrCreateStream(rtspUrl);
       console.log(hlsPlaylistUrl);
       res.json({ hlsUrl: hlsPlaylistUrl });
     } catch (err) {
