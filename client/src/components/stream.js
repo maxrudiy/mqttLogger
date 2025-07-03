@@ -27,7 +27,11 @@ const Stream = () => {
 
       if (Hls.isSupported()) {
         if (!hlsInstance.current) {
-          hlsInstance.current = new Hls({ debug: true });
+          hlsInstance.current = new Hls({
+            debug: true,
+            maxMaxBufferLength: 600,
+            maxBufferLength: 90,
+          });
           hlsInstance.current.log = true;
         }
 
