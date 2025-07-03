@@ -1,3 +1,5 @@
+import fs from "fs";
+
 const convertFunction = (received, devicesLibrary) => {
   const receivedDeviceId = Object.getOwnPropertyNames(received)[0];
   const libraryDeviceData = devicesLibrary.find((value) => value.device == receivedDeviceId);
@@ -23,4 +25,11 @@ const getFieldsByDataPoints = (model, devicesLibrary) => {
   return dataPoints.map((item) => item[0]);
 };
 
-export { convertFunction, getFieldsByDataPoints };
+const cleanupFunction = (dir) => {
+  fs.rm(dir, { recursive: true, force: true }, (err) => {
+    if (err) console.error(`Error cleaning up HLS directory ${dir}:`, err);
+    else console.log(`Cleaned up HLS directory: ${dir}`);
+  });
+};
+
+export { convertFunction, getFieldsByDataPoints, cleanupFunction };
