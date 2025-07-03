@@ -1,9 +1,9 @@
 import { spawn } from "child_process";
-import { cleanupFunction } from "./functions.js";
+import path from "path";
 
 const FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
 
-const startFFmpegStream = (rtspUrl, streamId, activeStreams, outputDir, outputPath) => {
+const startFFmpegStream = (rtspUrl, streamId, outputDir) => {
   console.log(`Starting FFmpeg for stream ID: ${streamId} from ${rtspUrl}`);
   const ffmpegArgs = [
     "-rtsp_transport",
@@ -31,22 +31,17 @@ const startFFmpegStream = (rtspUrl, streamId, activeStreams, outputDir, outputPa
     "-hls_time",
     "2",
     "-hls_list_size",
-    "5",
+    "10",
     "-hls_flags",
     "delete_segments",
     "-start_number",
     "0",
-    outputPath,
+    "-loglevel",
+    "error",
+    path.join(outputDir, "index.m3u8"),
   ];
 
   const ffmpegProcess = spawn(FFMPEG_PATH, ffmpegArgs);
-
-  activeStreams.set(streamId, {
-    process: ffmpegProcess,
-    lastAccess: Date.now(),
-    rtspUrl,
-    outputDir,
-  });
 
   ffmpegProcess.stdout.on("data", (data) => {
     // console.log(`FFmpeg stdout for ${streamId}: ${data}`);
@@ -58,18 +53,14 @@ const startFFmpegStream = (rtspUrl, streamId, activeStreams, outputDir, outputPa
 
   ffmpegProcess.on("close", (code) => {
     console.log(`FFmpeg process for stream ID ${streamId} exited with code ${code}`);
-    activeStreams.delete(streamId);
-    cleanupFunction(outputDir);
   });
 
   ffmpegProcess.on("error", (err) => {
     console.error(`Failed to start FFmpeg process for stream ID ${streamId}: ${err.message}`);
-    activeStreams.delete(streamId);
-    cleanupFunction(outputDir);
-    reject(err);
   });
 
   console.log(`Spawned FFmpeg with command: ffmpeg ${ffmpegArgs.join(" ")}`);
+  return ffmpegProcess;
 };
 
 export { startFFmpegStream };

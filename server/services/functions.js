@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 const convertFunction = (received, devicesLibrary) => {
   const receivedDeviceId = Object.getOwnPropertyNames(received)[0];
@@ -25,11 +26,29 @@ const getFieldsByDataPoints = (model, devicesLibrary) => {
   return dataPoints.map((item) => item[0]);
 };
 
-const cleanupFunction = (dir) => {
+const cleanupDir = (dir) => {
   fs.rm(dir, { recursive: true, force: true }, (err) => {
     if (err) console.error(`Error cleaning up HLS directory ${dir}:`, err);
     else console.log(`Cleaned up HLS directory: ${dir}`);
   });
 };
 
-export { convertFunction, getFieldsByDataPoints, cleanupFunction };
+const waitForHLSFiles = (dir, timeout) => {
+  return new Promise((resolve, reject) => {
+    const playlistPath = path.join(dir, "index.m3u8");
+    const timer = setTimeout(() => reject(new Error("Timed out waiting for HLS files")), timeout);
+    const watcher = fs.watch(dir, (event, filename) => {
+      if (filename === path.basename(playlistPath)) {
+        const playlistExists = fs.existsSync(playlistPath);
+        const tsFiles = fs.readdirSync(dir).filter((fileName, index) => fileName.endsWith(".ts"));
+        if (playlistExists && tsFiles.length > 0) {
+          clearTimeout(timer);
+          watcher.close();
+          return resolve();
+        }
+      }
+    });
+  });
+};
+
+export { convertFunction, getFieldsByDataPoints, cleanupDir, waitForHLSFiles };
