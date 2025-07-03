@@ -5,7 +5,7 @@ import { cleanupFunction } from "./functions.js";
 import { startFFmpegStream } from "./start-ffmpeg-stream.js";
 
 const IDLE_TIMEOUT_MS = 120000;
-const HLS_ENCODING_TIMEOUT_MS = 10000;
+const HLS_ENCODING_TIMEOUT_MS = 60000;
 const CLEANUP_INTERVAL_MS = 30000;
 
 const activeStreams = new Map();
