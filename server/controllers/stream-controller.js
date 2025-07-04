@@ -4,7 +4,7 @@ import { activeStreams } from "../services/get-or-create-stream.js";
 import { getOrCreateStream } from "../services/get-or-create-stream.js";
 const CAMERAS = JSON.parse(process.env.CAMERAS);
 
-class StreamsController {
+class StreamController {
   getCameraNames(req, res, next) {
     try {
       res.json(Object.keys(CAMERAS));
@@ -59,4 +59,4 @@ class StreamsController {
   }
 }
 
-export default new StreamsController();
+export default new StreamController();

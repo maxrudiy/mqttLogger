@@ -2,7 +2,7 @@ import NodeCache from "node-cache";
 import mqtt from "mqtt";
 import { convertFunction, getFieldsByDataPoints } from "./functions.js";
 import { devicesLibrary } from "./devices-library.js";
-import { SPM02V2Model } from "../models/devices-models.js";
+import { SPM02V2Model } from "../models/device-models.js";
 
 const queue = new NodeCache();
 

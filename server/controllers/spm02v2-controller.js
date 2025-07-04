@@ -1,4 +1,4 @@
-import { SPM02V2Model } from "../models/devices-models.js";
+import { SPM02V2Model } from "../models/device-models.js";
 import { validationResult } from "express-validator";
 import { ApiError } from "../exceptions/api-error.js";
 
