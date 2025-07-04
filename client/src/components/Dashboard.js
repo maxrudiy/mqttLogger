@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Message } from "./message";
 import { LatestChart } from "./latest-chart";
 import { ByTimeRangeChart } from "./by-time-range-chart";
-import { Stream } from "./stream";
+import { Streams } from "./streams";
+import { CameraNames } from "./camera-names";
 
 const Dashboard = () => {
+  const [selectedCamera, setSelectedCamera] = useState();
+
   return (
     <>
       <Message />
       <LatestChart />
       <ByTimeRangeChart />
-      <Stream />
+      <Streams selectedCamera={selectedCamera} />
+      <CameraNames setSelectedCamera={setSelectedCamera} />
     </>
   );
 };

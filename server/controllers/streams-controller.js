@@ -2,25 +2,25 @@ import fs from "fs";
 import path from "path";
 import { activeStreams } from "../services/get-or-create-stream.js";
 import { getOrCreateStream } from "../services/get-or-create-stream.js";
-const RTSP_URL = process.env.RTSP_URL;
+const CAMERAS = JSON.parse(process.env.CAMERAS);
 
 class StreamsController {
-  getStreamsNames(req, res, next) {
+  getCameraNames(req, res, next) {
     try {
-      //TODO
+      res.json(Object.keys(CAMERAS));
     } catch (err) {
       next(err);
     }
   }
   async getHlsPlaylistUrl(req, res, next) {
     try {
-      const streamName = req.query["stream-name"];
-      console.log(streamName);
-      //TODO
-      const rtspUrl = RTSP_URL;
+      const selectedCamera = req.query["selected-camera"];
+      const rtspUrl = CAMERAS[selectedCamera];
+      if (!rtspUrl) {
+        return res.status(404).send("Camera name not found.");
+      }
 
       const hlsPlaylistUrl = await getOrCreateStream(rtspUrl);
-      console.log(hlsPlaylistUrl);
       res.json({ hlsUrl: hlsPlaylistUrl });
     } catch (err) {
       return next(err);

@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import { useGetHlsPlaylistUrlQuery } from "../api/stream-api-slice";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetHlsPlaylistUrlQuery } from "../api/streams-api-slice";
 import Hls from "hls.js";
 
 const REACT_APP_SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-const Stream = () => {
+const Streams = ({ selectedCamera }) => {
   const videoRef = useRef(null);
   let hlsInstance = useRef(null);
 
-  const { data, isLoading, error } = useGetHlsPlaylistUrlQuery("name");
+  const { data, isLoading, error } = useGetHlsPlaylistUrlQuery(selectedCamera ?? skipToken);
 
   useEffect(() => {
     if (isLoading) {
@@ -97,4 +98,4 @@ const Stream = () => {
   return <video ref={videoRef} controls autoPlay muted className="w-full h-auto rounded-lg shadow-md" />;
 };
 
-export { Stream };
+export { Streams };
