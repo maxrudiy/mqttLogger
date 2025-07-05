@@ -2,6 +2,7 @@ import mqtt from "mqtt";
 import { convertFunction, getFieldsByDataPoints } from "./functions.js";
 import { devicesLibrary } from "./devices-library.js";
 import { SPM02V2Model } from "../models/device-models.js";
+import { wsEventEmitter, mqttEventEmitter } from "../events/events.js";
 
 const SPM02V2Queue = new Map();
 
@@ -10,7 +11,7 @@ const MQTT_USERNAME = process.env.MQTT_USERNAME;
 const MQTT_PASSWORD = process.env.MQTT_PASSWORD;
 const MQTT_TOPIC = process.env.MQTT_TOPIC;
 
-const mqttClient = (wsEventEmitter) => {
+const mqttClient = () => {
   let r = Math.floor(Math.random() * 10000);
   let clientId = "mqtt-" + r;
 
@@ -52,6 +53,10 @@ const mqttClient = (wsEventEmitter) => {
       } catch (err) {
         console.log(err.message);
       }
+    });
+
+    mqttEventEmitter.on("command", (command) => {
+      client.publish(`cmnd/${MQTT_TOPIC}/ZbSend`, JSON.stringify(command));
     });
   });
 };

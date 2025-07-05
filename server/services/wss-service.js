@@ -1,8 +1,9 @@
 import { WebSocketServer } from "ws";
+import { wsEventEmitter } from "../events/events.js";
 
 const WSS_PORT = process.env.WSS_PORT || 8081;
 
-const wsServer = (wsEventEmitter) => {
+const wsServer = () => {
   const wss = new WebSocketServer({ port: WSS_PORT });
 
   wss.on("connection", (ws) => {

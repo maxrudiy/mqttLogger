@@ -6,7 +6,7 @@ import cors from "cors";
 import { mqttClient } from "./services/mqtt-service.js";
 import { SPM02V2Router } from "./routes/spm02v2-routes.js";
 import { streamRouter } from "./routes/stream-routes.js";
-import { EventEmitter } from "node:events";
+import { BSD17Router } from "./routes/bsd17-routes.js";
 import { wsServer } from "./services/wss-service.js";
 import { errorLogger, errorResponse } from "./middlewares/errors-middleware.js";
 
@@ -15,7 +15,6 @@ const DB_URL = process.env.DB_URL;
 const CORS_WHITE_LIST = process.env.CORS_WHITE_LIST ? process.env.CORS_WHITE_LIST.split(",") : [];
 
 const app = express();
-const wsEventEmitter = new EventEmitter();
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -33,6 +32,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.use(SPM02V2Router);
 app.use(streamRouter);
+app.use(BSD17Router);
 app.use(errorLogger);
 app.use(errorResponse);
 
@@ -47,8 +47,8 @@ const start = async () => {
       mongoose.connection.on("error", (err) => reject(err));
     });
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    mqttClient(wsEventEmitter);
-    wsServer(wsEventEmitter);
+    mqttClient();
+    wsServer();
   } catch (err) {
     console.log(err);
   }
