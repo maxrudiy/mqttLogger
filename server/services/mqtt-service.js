@@ -10,7 +10,7 @@ const MQTT_USERNAME = process.env.MQTT_USERNAME;
 const MQTT_PASSWORD = process.env.MQTT_PASSWORD;
 const MQTT_TOPIC = process.env.MQTT_TOPIC;
 
-const mqttClient = (messageEventEmitter) => {
+const mqttClient = (wsEventEmitter) => {
   let r = Math.floor(Math.random() * 10000);
   let clientId = "mqtt-" + r;
 
@@ -44,7 +44,7 @@ const mqttClient = (messageEventEmitter) => {
             if (allFieldsPresent) {
               const data = { model: formattedMessage.model, ...Object.fromEntries(SPM02V2Queue.entries()), time: new Date().toISOString() };
               SPM02V2Model.create(data);
-              messageEventEmitter.emit("message", data); //Message cache using WebSocket service for update
+              wsEventEmitter.emit("message", data); //Message cache using WebSocket service for update
               SPM02V2Queue.clear();
             }
             break;

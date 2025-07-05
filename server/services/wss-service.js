@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 
 const WSS_PORT = process.env.WSS_PORT || 8081;
 
-const wsServer = (messageEventEmitter) => {
+const wsServer = (wsEventEmitter) => {
   const wss = new WebSocketServer({ port: WSS_PORT });
 
   wss.on("connection", (ws) => {
@@ -12,7 +12,7 @@ const wsServer = (messageEventEmitter) => {
       console.log(`Ws received: ${data}`);
     });
 
-    messageEventEmitter.on("message", (value) => {
+    wsEventEmitter.on("message", (value) => {
       ws.send(JSON.stringify(value));
     });
   });

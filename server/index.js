@@ -15,7 +15,7 @@ const DB_URL = process.env.DB_URL;
 const CORS_WHITE_LIST = process.env.CORS_WHITE_LIST ? process.env.CORS_WHITE_LIST.split(",") : [];
 
 const app = express();
-const messageEventEmitter = new EventEmitter();
+const wsEventEmitter = new EventEmitter();
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -47,8 +47,8 @@ const start = async () => {
       mongoose.connection.on("error", (err) => reject(err));
     });
     app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    mqttClient(messageEventEmitter);
-    wsServer(messageEventEmitter);
+    mqttClient(wsEventEmitter);
+    wsServer(wsEventEmitter);
   } catch (err) {
     console.log(err);
   }
