@@ -1,6 +1,6 @@
 import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ISOTimeStringToLocaleTimeString } from "../functions";
+import { ISOTimeStringToLocaleTimeString } from "../services/functions";
 
 const Chart = (props) => {
   const renderLineChart = (data) => {

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import chokidar from "chokidar";
 
 const convertFunction = (received, devicesLibrary) => {
   const receivedDeviceId = Object.getOwnPropertyNames(received)[0];
@@ -35,17 +36,20 @@ const cleanupDir = (dir) => {
 
 const waitForHLSFiles = (dir, timeout) => {
   return new Promise((resolve, reject) => {
-    const playlistPath = path.join(dir, "index.m3u8");
-    const timer = setTimeout(() => reject(new Error("Timed out waiting for HLS files")), timeout);
-    const watcher = fs.watch(dir, (event, filename) => {
-      if (filename === path.basename(playlistPath)) {
-        const playlistExists = fs.existsSync(playlistPath);
-        const tsFiles = fs.readdirSync(dir).filter((fileName, index) => fileName.endsWith(".ts"));
-        if (playlistExists && tsFiles.length > 0) {
-          clearTimeout(timer);
-          watcher.close();
-          return resolve();
-        }
+    const watcher = chokidar.watch(dir);
+
+    const timer = setTimeout(() => {
+      watcher.close().then(() => console.log("HLS files watcher has been closed"));
+      return reject(new Error("Timed out waiting for HLS files"));
+    }, timeout);
+
+    watcher.on("add", () => {
+      const playlistExists = fs.existsSync(path.join(dir, "index.m3u8"));
+      const tsFiles = fs.readdirSync(dir).filter((fileName, index) => fileName.endsWith(".ts"));
+      if (playlistExists && tsFiles.length > 0) {
+        clearTimeout(timer);
+        watcher.close().then(() => console.log("HLS files watcher has been closed"));
+        return resolve();
       }
     });
   });

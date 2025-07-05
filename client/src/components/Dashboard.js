@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Message } from "./message";
-import { LatestChart } from "./latest-chart";
-import { ByTimeRangeChart } from "./by-time-range-chart";
-import { Streams } from "./streams";
-import { CameraNames } from "./camera-names";
+import { Message } from "./Message";
+import { LatestChart } from "./LatestChart";
+import { ByTimeRangeChart } from "./ByTimeRangeChart";
+import { Streams } from "./Streams";
+import { CameraNames } from "./CameraNames";
 
 const Dashboard = () => {
   const [selectedCamera, setSelectedCamera] = useState();

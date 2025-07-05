@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import { useGetMessagesByTimeRangeQuery } from "../api/messages-api-slice";
-import Chart from "./chart";
+import Chart from "./Chart";
+
 import "react-datepicker/dist/react-datepicker.css";
 
 const ByTimeRangeChart = () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Chart from "./chart";
+import Chart from "./Chart";
 
 import { useGetLatestMessagesQuery } from "../api/messages-api-slice";
 import { useDispatch } from "react-redux";
