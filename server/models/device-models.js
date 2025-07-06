@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
 
 const SPM02V2Schema = new Schema({
-  model: String,
+  name: String,
+  hex: String,
   energy: Number,
   producedEnergy: Number,
   x: String,

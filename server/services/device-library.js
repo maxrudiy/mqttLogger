@@ -1,14 +1,11 @@
-const SPM02V2_DEVICE = process.env.SPM02V2_DEVICE;
-
 const divideBy10 = (value) => parseInt(value) / 10;
 const divideBy100 = (value) => parseInt(value) / 100;
 const divideBy1000 = (value) => parseInt(value) / 1000;
 const raw = (value) => value;
 
-const devicesLibrary = [
+const deviceLibrary = [
   {
     model: "SPM02V2",
-    device: SPM02V2_DEVICE,
     dataPoints: {
       1: ["energy", divideBy100],
       2: ["producedEnergy", divideBy100],
@@ -31,7 +28,7 @@ const devicesLibrary = [
   },
 ];
 
-export { devicesLibrary };
+export { deviceLibrary };
 
 const ConvertNegativeValues = (v, phase) => {
   // Support negative power readings

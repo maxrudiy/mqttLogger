@@ -1,10 +1,10 @@
 import mqtt from "mqtt";
 import { convertFunction, getFieldsByDataPoints } from "./functions.js";
-import { devicesLibrary } from "./devices-library.js";
+import { deviceLibrary } from "./device-library.js";
 import { SPM02V2Model } from "../models/device-models.js";
 import { wsEventEmitter, mqttEventEmitter } from "../events/events.js";
 
-const SPM02V2Queue = new Map();
+const QUEUE = new Map();
 
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
 const MQTT_USERNAME = process.env.MQTT_USERNAME;
@@ -33,20 +33,23 @@ const mqttClient = () => {
     client.on("message", (topic, message) => {
       try {
         const received = JSON.parse(message.toString()).ZbReceived;
-        const formattedMessage = convertFunction(received, devicesLibrary);
-        switch (formattedMessage.model) {
+        const { name, model, hex, property, value } = convertFunction(received, deviceLibrary);
+
+        switch (model) {
           case "SPM02V2":
-            // Save the field to cache
-            SPM02V2Queue.set(formattedMessage.propertyName, formattedMessage.value);
+            // Save the field of device to cache
+            !QUEUE.has(hex) ? QUEUE.set(hex, { [property]: value }) : (QUEUE.get(hex)[property] = value);
 
             // Check if all required fields are present in cache and save it to database
-            const REQUIRED_FIELDS = getFieldsByDataPoints(formattedMessage.model, devicesLibrary);
-            const allFieldsPresent = REQUIRED_FIELDS.every((field) => SPM02V2Queue.has(field));
+            const REQUIRED_FIELDS = getFieldsByDataPoints(model, deviceLibrary);
+            const allFieldsPresent = REQUIRED_FIELDS.every((field) => Object.hasOwn(QUEUE.get(hex), field));
             if (allFieldsPresent) {
-              const data = { model: formattedMessage.model, ...Object.fromEntries(SPM02V2Queue.entries()), time: new Date().toISOString() };
+              const data = { name, hex, ...QUEUE.get(hex) };
               SPM02V2Model.create(data);
-              wsEventEmitter.emit("message", data); //Message cache using WebSocket service for update
-              SPM02V2Queue.clear();
+              //Message cache using WebSocket service for update
+              wsEventEmitter.emit("message", { ...data, time: new Date().toISOString() });
+              //Clear cache
+              QUEUE.delete(hex);
             }
             break;
         }

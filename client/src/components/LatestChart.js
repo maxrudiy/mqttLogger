@@ -7,7 +7,7 @@ import { updateLatestMessage } from "../store/latest-message-slice";
 
 const LatestChart = () => {
   const [minutes, setMinutes] = useState(30);
-  const { data, isLoading } = useGetLatestMessagesQuery(minutes);
+  const { data, isLoading } = useGetLatestMessagesQuery({ minutes, hex: "0x94EF" });
 
   const dispatch = useDispatch();
   useEffect(() => {

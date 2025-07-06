@@ -2,24 +2,27 @@ import fs from "fs";
 import path from "path";
 import chokidar from "chokidar";
 
+const DEVICE_DEFINITION = JSON.parse(process.env.DEVICE_DEFINITION);
+
 const convertFunction = (received, devicesLibrary) => {
-  const receivedDeviceId = Object.getOwnPropertyNames(received)[0];
-  const libraryDeviceData = devicesLibrary.find((value) => value.device == receivedDeviceId);
+  const receivedHexId = Object.getOwnPropertyNames(received)[0];
+  //Search for the model in deviceDefinition by hex id from the received message.
+  const definedModelByHex = Object.getOwnPropertyNames(DEVICE_DEFINITION).find((model, index) => Object.hasOwn(DEVICE_DEFINITION[model], receivedHexId));
+  if (!definedModelByHex) throw new Error(`Device ${receivedHexId} is not found in device definition`);
 
-  if (!libraryDeviceData) {
-    throw new Error(`Device ${receivedDeviceId} not found in library`);
-  }
+  const libraryDeviceData = devicesLibrary.find((device) => device.model == definedModelByHex);
+  if (!libraryDeviceData) throw new Error(`Model ${definedModelByHex} not found in library`);
 
-  const id = Object.keys(received[receivedDeviceId]).find((value) => /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i.test(value)); //Search for "EF00/0265" - cluster id, manufacturer data and data point
-  const dp = parseInt(id.slice(-2), 16); // "65" - data point received in message
+  //Search for data point in received message
+  const receivedClusterAndDp = Object.keys(received[receivedHexId]).find((value) => /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i.test(value)); //Search for "EF00/0265" - cluster, manufacturer data and data point
+  const receivedDp = parseInt(receivedClusterAndDp.slice(-2), 16); // "65" - data point received in message
+  if (!libraryDeviceData.dataPoints[receivedDp]) throw new Error(`Data point ${receivedDp} of ${receivedHexId} not found in library`);
 
-  if (!libraryDeviceData.dataPoints[dp]) {
-    throw new Error(`Data point ${dp} of ${receivedDeviceId} not found in library`);
-  }
-  const propertyName = libraryDeviceData.dataPoints[dp][0];
-  const applyFunction = libraryDeviceData.dataPoints[dp][1];
+  const property = libraryDeviceData.dataPoints[receivedDp][0];
+  const applyFunction = libraryDeviceData.dataPoints[receivedDp][1];
+  const name = DEVICE_DEFINITION[definedModelByHex][receivedHexId].name;
 
-  return { model: libraryDeviceData.model, propertyName, value: applyFunction(received[receivedDeviceId][id]) };
+  return { name, model: definedModelByHex, hex: receivedHexId, property, value: applyFunction(received[receivedHexId][receivedClusterAndDp]) };
 };
 
 const getFieldsByDataPoints = (model, devicesLibrary) => {

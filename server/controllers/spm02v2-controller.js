@@ -9,10 +9,11 @@ class SPM02V2Controller {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest("Wrong request", errors.array()));
       }
-      const { minutes } = req.params;
-      const startTime = new Date(Date.now() - minutes * 60 * 1000);
+      const minutes = req.query["minutes"];
+      const hex = req.query["selected-device"];
 
-      const data = await SPM02V2Model.find({ time: { $gte: startTime } })
+      const startTime = new Date(Date.now() - minutes * 60 * 1000);
+      const data = await SPM02V2Model.find({ hex, time: { $gte: startTime } })
         .select("-_id")
         .sort({ time: "desc" });
 
@@ -31,10 +32,11 @@ class SPM02V2Controller {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest("Wrong request", errors.array()));
       }
+      const hex = req.query["selected-device"];
       const startTime = req.query["start-time"];
       const endTime = req.query["end-time"];
 
-      const data = await SPM02V2Model.find({ time: { $gte: startTime, $lte: endTime } })
+      const data = await SPM02V2Model.find({ hex, time: { $gte: startTime, $lte: endTime } })
         .select("-_id")
         .sort({ time: "desc" });
 

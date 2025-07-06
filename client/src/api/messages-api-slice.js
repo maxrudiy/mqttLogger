@@ -6,7 +6,7 @@ const REACT_APP_WSS_RECONNECT_DELAY = parseInt(process.env.REACT_APP_WSS_RECONNE
 const messagesApiSlice = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getLatestMessages: build.query({
-      query: (minutes) => `spm02v2/latest/${minutes}`,
+      query: ({ minutes, hex }) => `spm02v2/latest?minutes=${minutes}&selected-device=${hex}`,
       async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
         await cacheDataLoaded;
 
@@ -22,6 +22,7 @@ const messagesApiSlice = apiSlice.injectEndpoints({
           ws.addEventListener("message", (event) => {
             const data = JSON.parse(event.data);
             updateCachedData((draft) => {
+              console.log(data); //TODO Update only if hex of data == hex of selected device
               draft.unshift(data);
               draft.pop();
             });
@@ -51,7 +52,7 @@ const messagesApiSlice = apiSlice.injectEndpoints({
       },
     }),
     getMessagesByTimeRange: build.query({
-      query: (props) => `spm02v2/by-time-range?start-time=${props.startTime}&end-time=${props.endTime}`,
+      query: ({ startTime, endTime, hex }) => `spm02v2/by-time-range?start-time=${startTime}&end-time=${endTime}&selected-device=${hex}`,
     }),
   }),
 });

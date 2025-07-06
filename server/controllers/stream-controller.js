@@ -14,8 +14,8 @@ class StreamController {
   }
   async getHlsPlaylistUrl(req, res, next) {
     try {
-      const selectedCamera = req.query["selected-camera"];
-      const rtspUrl = CAMERAS[selectedCamera];
+      const camera = req.query["selected-camera"];
+      const rtspUrl = CAMERAS[camera];
       if (!rtspUrl) {
         return res.status(404).send("Camera name not found.");
       }

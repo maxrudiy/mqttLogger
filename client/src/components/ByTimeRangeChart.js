@@ -22,7 +22,7 @@ const ByTimeRangeChart = () => {
     }
   }, [startTime, endTime]);
 
-  const { data, isLoading } = useGetMessagesByTimeRangeQuery(queryParams);
+  const { data, isLoading } = useGetMessagesByTimeRangeQuery({ hex: "0x94EF", ...queryParams });
 
   return (
     <>
