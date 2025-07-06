@@ -22,7 +22,9 @@ const messagesApiSlice = apiSlice.injectEndpoints({
           ws.addEventListener("message", (event) => {
             const data = JSON.parse(event.data);
             updateCachedData((draft) => {
-              console.log(data); //TODO Update only if hex of data == hex of selected device
+              console.log(data); //TODO Update only if hex of data == hex of selected device or better check it on server in ws service
+              //TODO Create universal device model?
+              //Fix frontend for different meter models and quantity of counters
               draft.unshift(data);
               draft.pop();
             });
