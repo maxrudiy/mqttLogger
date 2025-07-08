@@ -18,16 +18,21 @@ const convertFunction = (received, devicesLibrary) => {
   const receivedDp = parseInt(receivedClusterAndDp.slice(-2), 16); // "65" - data point received in message
   if (!libraryDeviceData.dataPoints[receivedDp]) throw new Error(`Data point ${receivedDp} of ${receivedHexId} not found in library`);
 
-  const property = libraryDeviceData.dataPoints[receivedDp][0];
-  const applyFunction = libraryDeviceData.dataPoints[receivedDp][1];
+  const property = libraryDeviceData.dataPoints[receivedDp].property;
+  const applyFunctions = libraryDeviceData.dataPoints[receivedDp].applyFunctions;
   const name = DEVICE_DEFINITION[definedModelByHex][receivedHexId].name;
+  let value = received[receivedHexId][receivedClusterAndDp];
 
-  return { name, model: definedModelByHex, hex: receivedHexId, property, value: applyFunction(received[receivedHexId][receivedClusterAndDp]) };
+  for (const f of applyFunctions) {
+    value = f(value);
+  }
+
+  return { name, model: definedModelByHex, hex: receivedHexId, property, value };
 };
 
 const getFieldsByDataPoints = (model, devicesLibrary) => {
   const dataPoints = Object.values(devicesLibrary.find((item) => (item.model = model)).dataPoints);
-  return dataPoints.map((item) => item[0]);
+  return dataPoints.map((item) => item.property);
 };
 
 const cleanupDir = (dir) => {

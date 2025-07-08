@@ -1,47 +1,49 @@
-const divideBy10 = (value) => parseInt(value) / 10;
-const divideBy100 = (value) => parseInt(value) / 100;
-const divideBy1000 = (value) => parseInt(value) / 1000;
+const divideBy10 = (value) => {
+  if (!Number.isInteger(value)) value = parseInt(value);
+  return value / 10;
+};
+const divideBy100 = (value) => {
+  if (!Number.isInteger(value)) value = parseInt(value);
+  return value / 100;
+};
+const divideBy1000 = (value) => {
+  if (!Number.isInteger(value)) value = parseInt(value);
+  return value / 1000;
+};
 const raw = (value) => value;
+
+const unsignedToSigned = (value) => {
+  if (!Number.isInteger(value)) value = parseInt(value);
+  if (value >= 0x80000000) {
+    //Check if the sign bit is set >= 2^31
+    return value - 0x100000000; //Subtract 2^32 to get the negative value
+  }
+  return value;
+};
 
 const deviceLibrary = [
   {
     model: "SPM02V2",
     dataPoints: {
-      1: ["energy", divideBy100],
-      2: ["producedEnergy", divideBy100],
-      6: ["x", raw],
-      7: ["y", raw],
-      8: ["z", raw],
-      15: ["powerFactor", raw],
-      101: ["acFrequency", divideBy100],
-      102: ["voltageX", divideBy10],
-      103: ["currentX", divideBy1000],
-      104: ["powerX", raw],
-      105: ["voltageY", divideBy10],
-      106: ["currentY", divideBy1000],
-      107: ["powerY", raw],
-      108: ["voltageZ", divideBy10],
-      109: ["currentZ", divideBy1000],
-      110: ["powerZ", raw],
-      111: ["power", raw],
+      1: { property: "energy", applyFunctions: [divideBy100] },
+      2: { property: "producedEnergy", applyFunctions: [divideBy100] },
+      6: { property: "x", applyFunctions: [raw] },
+      7: { property: "y", applyFunctions: [raw] },
+      8: { property: "z", applyFunctions: [raw] },
+      15: { property: "powerFactor", applyFunctions: [raw] },
+      101: { property: "acFrequency", applyFunctions: [divideBy100] },
+      102: { property: "voltageX", applyFunctions: [divideBy10] },
+      103: { property: "currentX", applyFunctions: [unsignedToSigned, divideBy1000] },
+      104: { property: "powerX", applyFunctions: [unsignedToSigned, raw] },
+      105: { property: "voltageY", applyFunctions: [divideBy10] },
+      106: { property: "currentY", applyFunctions: [unsignedToSigned, divideBy1000] },
+      107: { property: "powerY", applyFunctions: [unsignedToSigned, raw] },
+      108: { property: "voltageZ", applyFunctions: [divideBy10] },
+      109: { property: "currentZ", applyFunctions: [unsignedToSigned, divideBy1000] },
+      110: { property: "powerZ", applyFunctions: [unsignedToSigned, raw] },
+      111: { property: "power", applyFunctions: [raw] },
     },
   },
 ];
 
 export { deviceLibrary };
-
-const ConvertNegativeValues = (v, phase) => {
-  // Support negative power readings
-  // https://github.com/Koenkk/zigbee2mqtt/issues/18603#issuecomment-2277697295
-  const buf = Buffer.from(v, "base64");
-  let power = buf[7] | (buf[6] << 8);
-  if (power > 0x7fff) {
-    power = (0x999a - power) * -1;
-  }
-
-  return {
-    [`voltage_${phase}`]: (buf[1] | (buf[0] << 8)) / 10,
-    [`current_${phase}`]: (buf[4] | (buf[3] << 8)) / 1000,
-    [`power_${phase}`]: power,
-  };
-};
