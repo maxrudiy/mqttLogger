@@ -1,5 +1,5 @@
 import mqtt from "mqtt";
-import { convertFunction, getFieldsByDataPoints } from "./functions.js";
+import { convertFunction, getRequiredFields } from "./functions.js";
 import { deviceLibrary } from "./device-library.js";
 import { SPM02V2Model } from "../models/device-models.js";
 import { wsEventEmitter, mqttEventEmitter } from "../events/events.js";
@@ -38,7 +38,7 @@ const mqttClient = () => {
         switch (model) {
           case "SPM02V2": {
             !QUEUE.has(hex) ? QUEUE.set(hex, { [property]: value }) : (QUEUE.get(hex)[property] = value); // Save the field of device to cache
-            const REQUIRED_FIELDS = getFieldsByDataPoints(model, deviceLibrary); // Check if all required fields are present in cache and save it to database
+            const REQUIRED_FIELDS = getRequiredFields(model, deviceLibrary); // Check if all required fields are present in cache and save it to database
             const allFieldsPresent = REQUIRED_FIELDS.every((field) => Object.hasOwn(QUEUE.get(hex), field));
             if (allFieldsPresent) {
               const data = { name, hex, ...QUEUE.get(hex) };
@@ -50,11 +50,10 @@ const mqttClient = () => {
           }
           case "PJ1203AW": {
             !QUEUE.has(hex) ? QUEUE.set(hex, { [property]: value }) : (QUEUE.get(hex)[property] = value);
-            const REQUIRED_FIELDS = getFieldsByDataPoints(model, deviceLibrary);
+            const REQUIRED_FIELDS = getRequiredFields(model, deviceLibrary);
             const allFieldsPresent = REQUIRED_FIELDS.every((field) => Object.hasOwn(QUEUE.get(hex), field));
             if (allFieldsPresent) {
-              
-              now = new Date(); //
+              const now = new Date(); //
               console.log(now.toLocaleString()); //
               console.log(QUEUE.get(hex)); //
 

@@ -13,17 +13,17 @@ const convertFunction = (received, devicesLibrary) => {
   const libraryDeviceData = devicesLibrary.find((device) => device.model == definedModelByHex);
   if (!libraryDeviceData) throw new Error(`Model ${definedModelByHex} not found in library`);
 
-  const { checkPattern, dataPoints } = libraryDeviceData;
+  const { metaPattern, dataPoints } = libraryDeviceData;
 
   //Search for data point in received message
-  const receivedClusterAndDp = Object.keys(received[receivedHexId]).find((value) => checkPattern.test(value)); //Search for "EF00/0265" - cluster, manufacturer data and data point
-  const receivedDp = parseInt(receivedClusterAndDp.slice(-2), 16); // "65" - data point received in message
+  const meta = Object.keys(received[receivedHexId]).find((value) => metaPattern.test(value)); //Search for "EF00/0265" - cluster, manufacturer data and data point
+  const receivedDp = parseInt(meta.slice(-2), 16); // "65" - data point received in message
   if (!dataPoints[receivedDp]) throw new Error(`Data point ${receivedDp} of ${receivedHexId} not found in library`);
 
   const property = dataPoints[receivedDp].prop;
   const applyFunctions = dataPoints[receivedDp].func;
   const name = DEVICE_DEFINITION[definedModelByHex][receivedHexId].name;
-  let value = received[receivedHexId][receivedClusterAndDp];
+  let value = received[receivedHexId][meta];
 
   for (const f of applyFunctions) {
     value = f(value);
@@ -32,7 +32,7 @@ const convertFunction = (received, devicesLibrary) => {
   return { name, model: definedModelByHex, hex: receivedHexId, property, value };
 };
 
-const getFieldsByDataPoints = (model, devicesLibrary) => {
+const getRequiredFields = (model, devicesLibrary) => {
   const dataPoints = Object.values(devicesLibrary.find((item) => item.model === model).dataPoints);
   return dataPoints.map((item) => item.prop);
 };
@@ -65,4 +65,4 @@ const waitForHLSFiles = (dir, timeout) => {
   });
 };
 
-export { convertFunction, getFieldsByDataPoints, cleanupDir, waitForHLSFiles };
+export { convertFunction, getRequiredFields, cleanupDir, waitForHLSFiles };
