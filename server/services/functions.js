@@ -13,13 +13,15 @@ const convertFunction = (received, devicesLibrary) => {
   const libraryDeviceData = devicesLibrary.find((device) => device.model == definedModelByHex);
   if (!libraryDeviceData) throw new Error(`Model ${definedModelByHex} not found in library`);
 
-  //Search for data point in received message
-  const receivedClusterAndDp = Object.keys(received[receivedHexId]).find((value) => /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i.test(value)); //Search for "EF00/0265" - cluster, manufacturer data and data point
-  const receivedDp = parseInt(receivedClusterAndDp.slice(-2), 16); // "65" - data point received in message
-  if (!libraryDeviceData.dataPoints[receivedDp]) throw new Error(`Data point ${receivedDp} of ${receivedHexId} not found in library`);
+  const { checkPattern, dataPoints } = libraryDeviceData;
 
-  const property = libraryDeviceData.dataPoints[receivedDp].property;
-  const applyFunctions = libraryDeviceData.dataPoints[receivedDp].applyFunctions;
+  //Search for data point in received message
+  const receivedClusterAndDp = Object.keys(received[receivedHexId]).find((value) => checkPattern.test(value)); //Search for "EF00/0265" - cluster, manufacturer data and data point
+  const receivedDp = parseInt(receivedClusterAndDp.slice(-2), 16); // "65" - data point received in message
+  if (!dataPoints[receivedDp]) throw new Error(`Data point ${receivedDp} of ${receivedHexId} not found in library`);
+
+  const property = dataPoints[receivedDp].prop;
+  const applyFunctions = dataPoints[receivedDp].func;
   const name = DEVICE_DEFINITION[definedModelByHex][receivedHexId].name;
   let value = received[receivedHexId][receivedClusterAndDp];
 
@@ -31,8 +33,8 @@ const convertFunction = (received, devicesLibrary) => {
 };
 
 const getFieldsByDataPoints = (model, devicesLibrary) => {
-  const dataPoints = Object.values(devicesLibrary.find((item) => (item.model = model)).dataPoints);
-  return dataPoints.map((item) => item.property);
+  const dataPoints = Object.values(devicesLibrary.find((item) => item.model === model).dataPoints);
+  return dataPoints.map((item) => item.prop);
 };
 
 const cleanupDir = (dir) => {
