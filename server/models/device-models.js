@@ -23,6 +23,30 @@ const SPM02V2Schema = new Schema({
   time: { type: Schema.Types.Date, default: () => Date.now() },
 });
 
-const SPM02V2Model = model("SPM02V2", SPM02V2Schema);
+const PJ1203AWSchema = new Schema({
+  name: String,
+  hex: String,
 
-export { SPM02V2Model };
+  energyFlowA: Number,
+  voltage: Number,
+  currentA: Number,
+  powerA: Number,
+  powerFactorA: Number,
+  acFrequency: Number,
+  powerAB: Number,
+  energyFlowB: Number,
+  currentB: Number,
+  powerB: Number,
+  powerFactorB: Number,
+
+  energyA: Number,
+  producedEnergyA: Number,
+  energyB: Number,
+  producedEnergyB: Number,
+  time: { type: Schema.Types.Date, default: () => Date.now() },
+});
+
+const SPM02V2Model = model("SPM02V2", SPM02V2Schema);
+const PJ1203AWModel = model("PJ1203AW", PJ1203AWSchema);
+
+export { SPM02V2Model, PJ1203AWModel };

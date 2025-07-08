@@ -1,7 +1,7 @@
 import mqtt from "mqtt";
 import { convertFunction, getRequiredFields } from "./functions.js";
 import { deviceLibrary } from "./device-library.js";
-import { SPM02V2Model } from "../models/device-models.js";
+import { SPM02V2Model, PJ1203AWModel } from "../models/device-models.js";
 import { wsEventEmitter, mqttEventEmitter } from "../events/events.js";
 
 const QUEUE = new Map();
