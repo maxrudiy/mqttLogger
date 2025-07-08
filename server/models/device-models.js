@@ -3,8 +3,8 @@ import { model, Schema } from "mongoose";
 const SPM02V2Schema = new Schema({
   name: String,
   hex: String,
-  energy: Number,
-  producedEnergy: Number,
+  energyXYZ: Number,
+  producedEnergyXYZ: Number,
   x: String,
   y: String,
   z: String,
@@ -19,7 +19,7 @@ const SPM02V2Schema = new Schema({
   voltageZ: Number,
   currentZ: Number,
   powerZ: Number,
-  power: Number,
+  powerXYZ: Number,
   time: { type: Schema.Types.Date, default: () => Date.now() },
 });
 

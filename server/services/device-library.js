@@ -21,13 +21,18 @@ const unsignedToSigned = (value) => {
   return value;
 };
 
+const energyFlow = (value) => {
+  if (value === "0") return "Forward";
+  else if (value === "1") return "Reverse";
+};
+
 const deviceLibrary = [
   {
     model: "SPM02V2",
     metaPattern: /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i,
     dataPoints: {
-      1: { prop: "energy", func: [divideBy100] },
-      2: { prop: "producedEnergy", func: [divideBy100] },
+      1: { prop: "energyXYZ", func: [divideBy100] },
+      2: { prop: "producedEnergyXYZ", func: [divideBy100] },
       6: { prop: "x", func: [raw] }, //?
       7: { prop: "y", func: [raw] }, //?
       8: { prop: "z", func: [raw] }, //?
@@ -42,31 +47,32 @@ const deviceLibrary = [
       108: { prop: "voltageZ", func: [divideBy10] },
       109: { prop: "currentZ", func: [unsignedToSigned, divideBy1000] },
       110: { prop: "powerZ", func: [unsignedToSigned, raw] },
-      111: { prop: "power", func: [raw] },
+      111: { prop: "powerXYZ", func: [raw] },
     },
   },
   {
-    model: "PJ1203AW",
+    model: "PJ1203AW", //Data points: https://github.com/Koenkk/zigbee2mqtt/issues/18419
     metaPattern: /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i,
     multiEndpointSkip: ["energyA", "producedEnergyA", "energyB", "producedEnergyB"],
     dataPoints: {
       //Emitted every update time
-      102: { prop: "energyFlowA", func: [raw] }, //EnergyFlow isn't emitted when current equals 0
+      102: { prop: "energyFlowA", func: [energyFlow, raw] }, //EnergyFlow isn't emitted when current equals 0
       112: { prop: "voltage", func: [divideBy10] },
       113: { prop: "currentA", func: [divideBy1000] },
       101: { prop: "powerA", func: [divideBy10] },
       110: { prop: "powerFactorA", func: [divideBy100] },
       111: { prop: "acFrequency", func: [divideBy100] },
-      115: { prop: "powerAB", func: [divideBy10] },
-      104: { prop: "energyFlowB", func: [raw] }, //EnergyFlow isn't emitted when current equals 0
+      115: { prop: "powerAB", func: [unsignedToSigned, divideBy10] },
+      104: { prop: "energyFlowB", func: [energyFlow, raw] }, //EnergyFlow isn't emitted when current equals 0
       114: { prop: "currentB", func: [divideBy1000] },
       105: { prop: "powerB", func: [divideBy10] },
       121: { prop: "powerFactorB", func: [divideBy100] },
-      //Emitted when value changes
+      //Emitted rarely
       106: { prop: "energyA", func: [divideBy1000] },
       107: { prop: "producedEnergyA", func: [divideBy1000] },
       108: { prop: "energyB", func: [divideBy1000] },
       109: { prop: "producedEnergyB", func: [divideBy1000] },
+      //129 DPID_UPDATE_RATE 	report/setting 	(1. report the update rate 2. big-endian, (3-60s) 3. unsigned int (32bits)
     },
   },
 ];
