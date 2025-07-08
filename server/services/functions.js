@@ -33,7 +33,9 @@ const convertFunction = (received, devicesLibrary) => {
 };
 
 const getRequiredFields = (model, devicesLibrary) => {
-  const dataPoints = Object.values(devicesLibrary.find((item) => item.model === model).dataPoints);
+  const libraryDeviceData = devicesLibrary.find((item) => item.model === model);
+  let dataPoints = Object.values(libraryDeviceData.dataPoints);
+  if (libraryDeviceData.multiEndpointSkip) dataPoints = dataPoints.filter((item) => !libraryDeviceData.multiEndpointSkip.includes(item.prop));
   return dataPoints.map((item) => item.prop);
 };
 

@@ -48,7 +48,7 @@ const deviceLibrary = [
   {
     model: "PJ1203AW",
     metaPattern: /[0-9a-f]{4}[\/?][0-9a-f]{2,4}/i,
-    skipFields: ["energyA", "producedEnergyA", "energyB", "producedEnergyB"],
+    multiEndpointSkip: ["energyA", "producedEnergyA", "energyB", "producedEnergyB"],
     dataPoints: {
       //Emitted every update time
       102: { prop: "energyFlowA", func: [raw] }, //? Is not emitted if current = 0
