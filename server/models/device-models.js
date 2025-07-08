@@ -26,19 +26,17 @@ const SPM02V2Schema = new Schema({
 const PJ1203AWSchema = new Schema({
   name: String,
   hex: String,
-
-  energyFlowA: Number,
+  energyFlowA: String,
   voltage: Number,
   currentA: Number,
   powerA: Number,
   powerFactorA: Number,
   acFrequency: Number,
   powerAB: Number,
-  energyFlowB: Number,
+  energyFlowB: String,
   currentB: Number,
   powerB: Number,
   powerFactorB: Number,
-
   energyA: Number,
   producedEnergyA: Number,
   energyB: Number,

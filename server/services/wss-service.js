@@ -13,7 +13,7 @@ const wsServer = () => {
       console.log(`Ws received: ${data}`);
     });
 
-    wsEventEmitter.on("message", (value) => {
+    wsEventEmitter.on("SPM02V2", (value) => {
       ws.send(JSON.stringify(value));
     });
   });

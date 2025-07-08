@@ -40,23 +40,26 @@ const mqttClient = () => {
             !QUEUE.has(hex) ? QUEUE.set(hex, { [property]: value }) : (QUEUE.get(hex)[property] = value); // Save the field of device to cache
             const REQUIRED_FIELDS = getRequiredFields(model, deviceLibrary); // Check if all required fields are present in cache and save it to database
             const allFieldsPresent = REQUIRED_FIELDS.every((field) => Object.hasOwn(QUEUE.get(hex), field));
+
             if (allFieldsPresent) {
               const data = { name, hex, ...QUEUE.get(hex) };
               SPM02V2Model.create(data);
-              wsEventEmitter.emit("message", { ...data, time: new Date().toISOString() }); //Message cache using WebSocket service for update
+              wsEventEmitter.emit("SPM02V2", { ...data, time: new Date().toISOString() }); //Message cache using WebSocket service for update
               QUEUE.delete(hex); //Clear cache
             }
             break;
           }
           case "PJ1203AW": {
             !QUEUE.has(hex) ? QUEUE.set(hex, { [property]: value }) : (QUEUE.get(hex)[property] = value);
+            if (!QUEUE.get(hex)["energyFlowA"] && QUEUE.get(hex)["currentA"] === 0) QUEUE.get(hex)["energyFlowA"] = "Not emitted";
+            if (!QUEUE.get(hex)["energyFlowB"] && QUEUE.get(hex)["currentB"] === 0) QUEUE.get(hex)["energyFlowB"] = "Not emitted";
             const REQUIRED_FIELDS = getRequiredFields(model, deviceLibrary);
             const allFieldsPresent = REQUIRED_FIELDS.every((field) => Object.hasOwn(QUEUE.get(hex), field));
-            if (allFieldsPresent) {
-              const now = new Date(); //
-              console.log(now.toLocaleString()); //
-              console.log(QUEUE.get(hex)); //
 
+            if (allFieldsPresent) {
+              const data = { name, hex, ...QUEUE.get(hex) };
+              PJ1203AWModel.create(data);
+              wsEventEmitter.emit("PJ1203AW", { ...data, time: new Date().toISOString() }); //Message cache using WebSocket service for update
               QUEUE.delete(hex);
             }
             break;

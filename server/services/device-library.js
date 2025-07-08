@@ -51,14 +51,14 @@ const deviceLibrary = [
     multiEndpointSkip: ["energyA", "producedEnergyA", "energyB", "producedEnergyB"],
     dataPoints: {
       //Emitted every update time
-      102: { prop: "energyFlowA", func: [raw] }, //? Is not emitted if current = 0
+      102: { prop: "energyFlowA", func: [raw] }, //EnergyFlow isn't emitted when current equals 0
       112: { prop: "voltage", func: [divideBy10] },
       113: { prop: "currentA", func: [divideBy1000] },
       101: { prop: "powerA", func: [divideBy10] },
       110: { prop: "powerFactorA", func: [divideBy100] },
       111: { prop: "acFrequency", func: [divideBy100] },
       115: { prop: "powerAB", func: [divideBy10] },
-      104: { prop: "energyFlowB", func: [raw] }, //? Is not emitted if current = 0
+      104: { prop: "energyFlowB", func: [raw] }, //EnergyFlow isn't emitted when current equals 0
       114: { prop: "currentB", func: [divideBy1000] },
       105: { prop: "powerB", func: [divideBy10] },
       121: { prop: "powerFactorB", func: [divideBy100] },
