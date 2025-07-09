@@ -73,6 +73,7 @@ const deviceLibrary = [
       108: { prop: "energyB", func: [divideBy1000] },
       109: { prop: "producedEnergyB", func: [divideBy1000] },
       //129 DPID_UPDATE_RATE 	report/setting 	(1. report the update rate 2. big-endian, (3-60s) 3. unsigned int (32bits)
+      //ZbSend {"device":"0x0FBF","Write":{"EF00/0281":10}}
     },
   },
 ];
