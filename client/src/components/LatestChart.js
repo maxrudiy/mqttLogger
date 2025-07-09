@@ -17,7 +17,7 @@ const LatestChart = () => {
   return (
     <>
       <input type="text" onChange={(event) => setMinutes(event.target.value)} defaultValue={minutes} />
-      <Chart data={data} isLoading={isLoading} />
+      {!isLoading ? <Chart data={data} skipFields={["acFrequency", "hex", "name", "x", "y", "z"]} /> : "Loading"}
     </>
   );
 };

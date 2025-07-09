@@ -38,7 +38,7 @@ const ByTimeRangeChart = () => {
       <p>
         Showing results from <strong>{queryParams.startTime}</strong> to <strong>{queryParams.endTime}</strong>
       </p>
-      <Chart data={data} isLoading={isLoading} />
+      {!isLoading ? <Chart data={data} skipFields={["acFrequency", "hex", "name", "x", "y", "z"]} /> : "Loading"}
     </>
   );
 };

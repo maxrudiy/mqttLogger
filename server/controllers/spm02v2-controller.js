@@ -14,7 +14,7 @@ class SPM02V2Controller {
 
       const startTime = new Date(Date.now() - minutes * 60 * 1000);
       const data = await SPM02V2Model.find({ hex, time: { $gte: startTime } })
-        .select("-_id")
+        .select("-_id -__v")
         .sort({ time: "desc" });
 
       const interval = Math.ceil(data.length / 1000); //1000 - maximum number of records returned to client, excess data is evenly skipped
@@ -37,7 +37,7 @@ class SPM02V2Controller {
       const endTime = req.query["end-time"];
 
       const data = await SPM02V2Model.find({ hex, time: { $gte: startTime, $lte: endTime } })
-        .select("-_id")
+        .select("-_id -__v")
         .sort({ time: "desc" });
 
       const interval = Math.ceil(data.length / 1000); //1000 - maximum number of records returned to client, excess data is evenly skipped
