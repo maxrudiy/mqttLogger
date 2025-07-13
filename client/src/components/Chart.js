@@ -13,7 +13,7 @@ const Chart = ({ data, skipFields }) => {
 
   useEffect(() => {
     if (dataKeys) setSelectedKeys(Object.fromEntries(dataKeys.map((dataKey) => [dataKey, true])));
-  }, [dataKeys]);
+  }, []);
 
   useEffect(() => {
     setReducedDataState(reducedData);
